@@ -28,7 +28,7 @@ class PupilModel(models.Model):
         max_length=20,
     )
     group = models.IntegerField(
-        choices.GROUP_CHOICES,
+        choices=choices.GROUP_CHOICES,
         default=1,
     )
     vision_defect = models.BooleanField(
