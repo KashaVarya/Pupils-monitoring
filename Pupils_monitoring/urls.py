@@ -20,4 +20,10 @@ from monitoring import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.MainView.as_view(), name='main page'),
+    url(r'^pupils$', views.PupilsView.as_view(), name='pupils base'),
+    url(r'^teachers$', views.TeachersView.as_view(), name='teachers base'),
+    url(r'^absence$', views.AbsenceView.as_view(), name='absence base'),
+    url(r'^add_absence$', views.AddAbsenceView.as_view(), name='add absence'),
+    url(r'^add_group$', views.AddGroupView.as_view(), name='add group'),
+    url(r'^add_discount$', views.AddDiscountView.as_view(), name='add discount'),
 ]
