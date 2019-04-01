@@ -1,0 +1,31 @@
+{% extends "monitoring/wrapper.html" %}
+
+{% block main %}
+    <h1>Заповнити анкету про пільги на харчування</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <select name="pupil" required>
+            {% for pupil in pupils %}
+                <option>
+                    {{ pupil.id }}
+                    {{ pupil.last_name }}
+                    {{ pupil.first_name }}
+                    {{ pupil.middle_name }}
+                </option>
+            {% endfor %}
+        </select>
+        <br>
+        <select name="discount" required>
+            {% for discount in discounts %}
+                <option>
+                    {{ discount.0 }} {{ discount.1 }}
+                </option>
+            {% endfor %}
+        </select>
+        <br>
+        <button type="submit">Зберегти</button>
+    </form>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "monitoring/wrapper.html" %}
+
+{% block main %}
+    <h1>Списки відсутніх</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <td>ПІБ учня</td>
+            <td>Дата</td>
+            <td>Причина</td>
+            <td>Час запізнення</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for pupil in absence %}
+            <tr>
+                <td>
+                    {{ pupil.pupil.last_name }}
+                    {{ pupil.pupil.first_name }}
+                    {{ pupil.pupil.middle_name }}
+                </td>
+                <td>{{ pupil.day }} </td>
+                <td>{{ pupil.get_cause_display }} </td>
+                <td>
+                    {% if pupil.time %}
+                        {{ pupil.time }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

@@ -1,5 +1,57 @@
 {% extends "monitoring/wrapper.html" %}
 
 {% block main %}
-    <h1>Аналіз захворюванності:</h1>
+    <h1>База учнів</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <td>ПІБ</td>
+            <td>День народження</td>
+            <td>Стать</td>
+            <td>Адреса</td>
+            <td>Телефон</td>
+            <td>Група по фізичній культурі</td>
+            <td>Дефекти зору</td>
+            <td>Пільги на харчування</td>
+            <td>Клас</td>
+            <td>Батьки</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for pupil in pupils %}
+            <tr>
+                <td>
+                    {{ pupil.last_name }}
+                    {{ pupil.first_name }}
+                    {{ pupil.middle_name }}
+                </td>
+                <td>{{ pupil.birthday }}</td>
+                <td>{{ pupil.get_gender_display }}</td>
+                <td>{{ pupil.address }}</td>
+                <td>{{ pupil.phone }}</td>
+                <td>{{ pupil.get_group_display }}</td>
+                <td>
+                    {% if pupil.vision_defect %}
+                        Э
+                    {% else %}
+                        Немає
+                    {% endif %}
+                </td>
+                <td>{{ pupil.get_discount_display }}</td>
+                <td>{{ pupil.pupil_class.name }}</td>
+                {% for parent in pupil.parent.all %}
+                    <td>
+                        {{ parent.last_name }}
+                        {{ parent.first_name }}
+                        {{ parent.middle_name }},
+                        {{ parent.job_place }},
+                        {{ parent.phone }}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
 {% endblock %}
