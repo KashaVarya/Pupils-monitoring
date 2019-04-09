@@ -3,24 +3,40 @@
 {% block main %}
     <h1>База учнів</h1>
 
-    <table>
+    <div>
+        <select id="class-select">
+            <option disabled selected>Оберiть клас</option>
+            <option value="0">Усі класи</option>
+            {% for class in classes %}
+                <option value="{{ class.id }}">{{ class.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <span>Для сортування рядків таблиці натисніть на заголовок стовбця.</span>
+
+    <table id="pupilsTable">
         <thead>
         <tr>
-            <td>ПІБ</td>
-            <td>День народження</td>
-            <td>Стать</td>
-            <td>Адреса</td>
-            <td>Телефон</td>
-            <td>Група по фізичній культурі</td>
-            <td>Дефекти зору</td>
-            <td>Пільги на харчування</td>
-            <td>Клас</td>
-            <td>Батьки</td>
+            <th onclick="sortTable(0)">ПІБ</th>
+            <th onclick="sortTable(1)">День народження</th>
+            <th onclick="sortTable(2)">Стать</th>
+            <th onclick="sortTable(3)">Адреса</th>
+            <th onclick="sortTable(4)">Телефон</th>
+            <th onclick="sortTable(5)">Група по фізичній культурі</th>
+            <th onclick="sortTable(6)">Дефекти зору</th>
+            <th onclick="sortTable(7)">Пільги на харчування</th>
+            <th onclick="sortTable(8)">Клас</th>
+            <th onclick="sortTable(9)">Батьки</th>
         </tr>
         </thead>
+
         <tbody>
         {% for pupil in pupils %}
-            <tr>
+            <tr
+                    data-cls="{{ pupil.pupil_class.id }}"
+                    class="pupil-row"
+            >
                 <td>
                     {{ pupil.last_name }}
                     {{ pupil.first_name }}
@@ -53,5 +69,76 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <script>
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+
+            table = document.getElementById("pupilsTable");
+            switching = true;
+            dir = "asc";
+
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+
+                    x = rows[i].getElementsByTagName("td")[n];
+                    y = rows[i + 1].getElementsByTagName("td")[n];
+
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLocaleLowerCase() > y.innerHTML.toLocaleLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLocaleLowerCase() < y.innerHTML.toLocaleLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+
+        (function () {
+                var filters = {
+                    cls: '0'
+                };
+
+                function filterTable() {
+                    Array.from(document.querySelectorAll('pupil-row')).forEach((row) => {
+                        var pup_cl = row.dataset.cls;
+
+                        if (
+                            filters.cls === '0' || pup_cl === filters.cls
+                        ) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                }
+
+                document.getElementById('class-select').addEventListener('change', function (event) {
+                    filters.cls = event.target.value;
+                    filterTable();
+                });
+            }());
+
+    </script>
 
 {% endblock %}

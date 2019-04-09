@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.shortcuts import redirect
 from django.views.generic import TemplateView, ListView
-from monitoring.models import PupilModel, TeacherModel, AbsenceModel
+from monitoring.models import PupilModel, TeacherModel, AbsenceModel, ClassModel
 
 
 class MainView(TemplateView):
@@ -18,6 +18,9 @@ class PupilsView(ListView):
         context = super().get_context_data(**kwargs)
         pupils = PupilModel.objects.all()
         context['pupils'] = pupils
+
+        classes = set(ClassModel.objects.all())
+        context['classes'] = classes
 
         return context
 
