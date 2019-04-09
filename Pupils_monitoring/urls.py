@@ -26,4 +26,5 @@ urlpatterns = [
     url(r'^add_absence$', views.AddAbsenceView.as_view(), name='add absence'),
     url(r'^add_group$', views.AddGroupView.as_view(), name='add group'),
     url(r'^add_discount$', views.AddDiscountView.as_view(), name='add discount'),
+    url(r'^pupils_archive$', views.pupils_archive_view, name='download pupils archive'),
 ]

@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import sqlite3
+from zipfile import ZipFile
 from django.shortcuts import redirect
-from django.views.generic import TemplateView, ListView
+from django.http import FileResponse
+from django.views.generic import TemplateView, ListView, View
 from monitoring.models import PupilModel, TeacherModel, AbsenceModel, ClassModel
 
 
@@ -128,3 +131,19 @@ class AddDiscountView(TemplateView):
 
         return redirect('/pupils')
 
+
+def pupils_archive_view(request):
+
+    connection = sqlite3.connect('db.sqlite3')
+
+    with open('pupils.csv', 'wb') as file:
+        cursor = connection.cursor()
+        for row in cursor.execute('SELECT * FROM monitoring_pupilmodel'):
+            write_row = ','.join([str(i) for i in row])
+            write_row = write_row + '\n'
+            file.write(write_row.encode())
+
+    with ZipFile('pupils.zip', 'w') as myzip:
+        myzip.write('pupils.csv')
+
+    return FileResponse(open('pupils.zip', 'rb'), as_attachment=True)

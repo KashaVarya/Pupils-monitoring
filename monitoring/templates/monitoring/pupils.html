@@ -4,6 +4,14 @@
     <h1>База учнів</h1>
 
     <div>
+        <a href="pupils_archive">
+            <button type="submit">
+                Завантажити архів усіх учнів, які коли-небудь навчалися у школі
+            </button>
+        </a>
+    </div>
+
+    <div>
         <select id="class-select">
             <option disabled selected>Оберiть клас</option>
             <option value="0">Усі класи</option>
@@ -115,29 +123,29 @@
         }
 
         (function () {
-                var filters = {
-                    cls: '0'
-                };
+            var filters = {
+                cls: '0'
+            };
 
-                function filterTable() {
-                    Array.from(document.querySelectorAll('pupil-row')).forEach((row) => {
-                        var pup_cl = row.dataset.cls;
+            function filterTable() {
+                Array.from(document.querySelectorAll('pupil-row')).forEach((row) => {
+                    var pup_cl = row.dataset.cls;
 
-                        if (
-                            filters.cls === '0' || pup_cl === filters.cls
-                        ) {
-                            row.style.display = '';
-                        } else {
-                            row.style.display = 'none';
-                        }
-                    });
-                }
-
-                document.getElementById('class-select').addEventListener('change', function (event) {
-                    filters.cls = event.target.value;
-                    filterTable();
+                    if (
+                        filters.cls === '0' || pup_cl === filters.cls
+                    ) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
                 });
-            }());
+            }
+
+            document.getElementById('class-select').addEventListener('change', function (event) {
+                filters.cls = event.target.value;
+                filterTable();
+            });
+        }());
 
     </script>
 
