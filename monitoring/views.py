@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import matplotlib.pyplot as plt
 import sqlite3
 from zipfile import ZipFile
 from django.shortcuts import redirect
@@ -11,6 +12,105 @@ from monitoring.models import PupilModel, TeacherModel, AbsenceModel, ClassModel
 
 class MainView(TemplateView):
     template_name = "monitoring/index.html"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        connection = sqlite3.connect('db.sqlite3')
+        cursor = connection.cursor()
+        data_abs = cursor.execute(
+            'select pupils.pupil_class_id, count(pupils.id) '
+            'from monitoring_absencemodel as absc '
+            'inner join monitoring_pupilmodel as pupils '
+            'on absc.pupil_id=pupils.id '
+            'where absc.day = date() '
+            'group by pupils.pupil_class_id;'
+        ).fetchall()
+
+        data_cls = cursor.execute(
+            'select pupils.pupil_class_id, count(pupils.id) '
+            'from monitoring_pupilmodel as pupils '
+            'inner join monitoring_classmodel as cls '
+            'on pupils.pupil_class_id=cls.id '
+            'group by pupils.pupil_class_id;'
+        ).fetchall()
+
+        abs = dict()
+        class_model = set(ClassModel.objects.all())
+        for cls in class_model:
+            abs[cls.id] = [0, 0]
+
+        for row in data_abs:
+            abs[row[0]][0] = row[1]
+
+        for row in data_cls:
+            abs[row[0]][1] = row[1]
+
+        class_model = set(ClassModel.objects.all())
+        classes = list()
+        all_pupils = 0
+        abs_pupils = 0
+        warn = 0
+        for cls in class_model:
+            perc_class = abs[cls.id][0] * 100 / abs[cls.id][1] if abs[cls.id][0] != 0 else 0
+            classes.append([
+                cls.id,
+                cls.name,
+                abs[cls.id][0],
+                perc_class
+            ])
+            all_pupils += abs[cls.id][1]
+            abs_pupils += abs[cls.id][0]
+            warn = warn + 1 if perc_class > 20 else warn
+
+        perc_pupils = abs_pupils * 100 / all_pupils
+        perc_cls = warn * 100 / class_model.__len__()
+        context['classes'] = classes
+        context['all'] = all_pupils
+        context['perc_pupils'] = perc_pupils
+        context['perc_cls'] = perc_cls
+
+        abs_gisto = cursor.execute(
+            'select count(abs.cause) '
+            'from monitoring_absencemodel as abs '
+            'where abs.day = date() '
+            'group by abs.cause;'
+        ).fetchall()
+
+        data_names = [
+            'Хвороба',
+            'Прогул',
+            'Запізнення'
+        ]
+        data_values = [
+            abs_gisto[0][0],
+            abs_gisto[1][0],
+            abs_gisto[2][0]
+        ]
+
+        dpi = 80
+        fig = plt.figure(dpi=dpi, figsize=(512 / dpi, 384 / dpi))
+
+        plt.title('Розподіл відсутніх')
+
+        ax = plt.axes()
+        ax.yaxis.grid(True, zorder=1)
+
+        xs = range(len(data_names))
+
+        plt.bar(
+            [x + 0.05 for x in xs],
+            [d * 1.0 for d in data_values],
+            width=0.2,
+            color='green',
+            alpha=0.7,
+            zorder=2)
+
+        plt.xticks(xs, data_names)
+        fig.autofmt_xdate(rotation=25)
+        fig.savefig('monitoring/static/monitoring/absence.png')
+
+        return context
 
 
 class PupilsView(ListView):
@@ -24,6 +124,12 @@ class PupilsView(ListView):
 
         classes = set(ClassModel.objects.all())
         context['classes'] = classes
+
+        groups = PupilModel._meta.get_field('group').choices
+        context['groups'] = groups
+
+        discounts = PupilModel._meta.get_field('discount').choices
+        context['discounts'] = discounts
 
         return context
 
@@ -133,7 +239,6 @@ class AddDiscountView(TemplateView):
 
 
 def pupils_archive_view(request):
-
     connection = sqlite3.connect('db.sqlite3')
 
     with open('pupils.csv', 'wb') as file:

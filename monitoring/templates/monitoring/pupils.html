@@ -19,6 +19,36 @@
                 <option value="{{ class.id }}">{{ class.name }}</option>
             {% endfor %}
         </select>
+    <button onclick="printFunction()">Роздрукувати список класу</button>
+    </div>
+
+    <div>
+        <select id="group-select">
+            <option disabled selected>Оберiть групу по фізичній культурі</option>
+            <option value="0">Усі групи</option>
+            {% for group in groups %}
+                <option value="{{ group.0 }}">{{ group.1 }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <select id="vision-select">
+            <option disabled selected>Чи наявні вади зору?</option>
+            <option value="0">Усі учні</option>
+            <option value="True">Так</option>
+            <option value="False">Ні</option>
+        </select>
+    </div>
+
+    <div>
+        <select id="discount-select">
+            <option disabled selected>Оберiть вид пільги на харчування</option>
+            <option value="0">Усі учні</option>
+            {% for discount in discounts %}
+                <option value="{{ discount.0 }}">{{ discount.1 }}</option>
+            {% endfor %}
+        </select>
     </div>
 
     <span>Для сортування рядків таблиці натисніть на заголовок стовбця.</span>
@@ -43,7 +73,11 @@
         {% for pupil in pupils %}
             <tr
                     data-cls="{{ pupil.pupil_class.id }}"
+                    data-group="{{ pupil.group }}"
+                    data-vision="{{ pupil.vision_defect }}"
+                    data-discount="{{ pupil.discount }}"
                     class="pupil-row"
+                    id="{{ pupil.id }}"
             >
                 <td>
                     {{ pupil.last_name }}
@@ -57,7 +91,7 @@
                 <td>{{ pupil.get_group_display }}</td>
                 <td>
                     {% if pupil.vision_defect %}
-                        Э
+                        Є
                     {% else %}
                         Немає
                     {% endif %}
@@ -124,15 +158,24 @@
 
         (function () {
             var filters = {
-                cls: '0'
+                cls: '0',
+                group: '0',
+                vision: '0',
+                discount: '0'
             };
 
             function filterTable() {
-                Array.from(document.querySelectorAll('pupil-row')).forEach((row) => {
-                    var pup_cl = row.dataset.cls;
+                Array.from(document.querySelectorAll('.pupil-row')).forEach((row) => {
+                    var cls = row.dataset.cls;
+                    var group = row.dataset.group;
+                    var vision = row.dataset.vision;
+                    var discount = row.dataset.discount;
 
                     if (
-                        filters.cls === '0' || pup_cl === filters.cls
+                        (filters.cls === '0' || cls === filters.cls) &&
+                        (filters.group === '0' || group === filters.group) &&
+                        (filters.vision === '0' || vision === filters.vision) &&
+                        (filters.discount === '0' || discount === filters.discount)
                     ) {
                         row.style.display = '';
                     } else {
@@ -145,7 +188,26 @@
                 filters.cls = event.target.value;
                 filterTable();
             });
+
+            document.getElementById('group-select').addEventListener('change', function (event) {
+                filters.group = event.target.value;
+                filterTable();
+            });
+
+            document.getElementById('vision-select').addEventListener('change', function (event) {
+                filters.vision = event.target.value;
+                filterTable();
+            });
+
+            document.getElementById('discount-select').addEventListener('change', function (event) {
+                filters.discount = event.target.value;
+                filterTable();
+            });
         }());
+
+        function printFunction() {
+            window.print();
+        }
 
     </script>
 
