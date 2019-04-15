@@ -105,3 +105,4 @@ venv.bak/
 
 .idea/
 secret.py
+Pipfile.lock
