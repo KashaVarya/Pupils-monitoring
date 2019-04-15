@@ -82,11 +82,19 @@ class MainView(TemplateView):
             'Прогул',
             'Запізнення'
         ]
-        data_values = [
-            abs_gisto[0][0],
-            abs_gisto[1][0],
-            abs_gisto[2][0]
-        ]
+
+        try:
+            data_values = [
+                abs_gisto[0][0],
+                abs_gisto[1][0],
+                abs_gisto[2][0]
+            ]
+        except IndexError:
+            data_values = [
+                0,
+                0,
+                0,
+            ]
 
         dpi = 80
         fig = plt.figure(dpi=dpi, figsize=(512 / dpi, 384 / dpi))
