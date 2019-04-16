@@ -2,45 +2,57 @@
 {% load static %}
 
 {% block main %}
-    <h1>Аналіз захворюванності</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1 class="my-4">Аналіз захворюванності</h1>
 
-    {% if perc_cls >= 20 %}
-    <h3>Школа потребує закриття на карантин! Відсоток класів, закритих на карантин, складає {{ perc_cls }}%.</h3>
-    {% else %}
-        <h3>Школа не потребує закриття на карантин. Відсоток класів, закритих на карантин, складає {{ perc_cls }}%.</h3>
-    {% endif %}
-
-    <h4>Кількість відсутніх: {{ all }}.</h4>
-    <h4>Відсоток відсутніх: {{ perc_pupils }}%.</h4>
-
-    <h4>Дані про відсутніх по класам</h4>
-    <table>
-        <thead>
-        <tr>
-            <th>Клас</th>
-            <th>Кількість відсутніх</th>
-            <th>Відсоток відсутніх</th>
-            <th>Потребує закриття на карантин</th>
-        </tr>
-        </thead>
-
-        <tbody>
-        {% for class in classes %}
-            <tr>
-                <td>{{ class.1 }}</td>
-                <td>{{ class.2 }}</td>
-                <td>{{ class.3 }}</td>
-                {% if class.3 >= 20 %}
-                    <td>Так!</td>
+                {% if perc_cls >= 20 %}
+                    <h3>Школа потребує закриття на карантин! Відсоток класів, закритих на карантин,
+                        складає {{ perc_cls }}%.</h3>
                 {% else %}
-                    <td>Ні</td>
+                    <h3>Школа не потребує закриття на карантин. Відсоток класів, закритих на карантин,
+                        складає {{ perc_cls }}%.</h3>
                 {% endif %}
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
 
-    <img src="{% static "monitoring/absence.png" %}" alt="gisto">
+                <h4>Кількість відсутніх: {{ all }}.</h4>
+                <h4>Відсоток відсутніх: {{ perc_pupils }}%.</h4>
+
+                <h4>Дані про відсутніх по класам</h4>
+                <table class="table table-striped table-responsive-sm">
+                    <thead>
+                    <tr>
+                        <th>Клас</th>
+                        <th>Кількість відсутніх</th>
+                        <th>Відсоток відсутніх</th>
+                        <th>Потребує закриття на карантин</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for class in classes %}
+                        <tr>
+                            <td>{{ class.1 }}</td>
+                            <td>{{ class.2 }}</td>
+                            <td>{{ class.3 }}</td>
+                            {% if class.3 >= 20 %}
+                                <td>Так!</td>
+                            {% else %}
+                                <td>Ні</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="text-center">
+                    <a href="{% static "monitoring/absence.png" %}" target="_blank">
+                        <img class="mw-100" src="{% static "monitoring/absence.png" %}" alt="gisto">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 {% endblock %}

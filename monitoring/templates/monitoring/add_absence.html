@@ -1,35 +1,61 @@
 {% extends "monitoring/wrapper.html" %}
 
 {% block main %}
-    <h1>Внести вісутніх</h1>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h1 class="my-4">Внести вісутніх</h1>
 
-    <form method="post">
-        {% csrf_token %}
-        <select name="cause" required>
-            {% for cause in causes %}
-                <option>
-                    {{ cause.0 }} {{ cause.1 }}
-                </option>
-            {% endfor %}
-        </select>
-        <br>
-        <select name="pupil" required>
-            {% for pupil in pupils %}
-                <option>
-                    {{ pupil.id }}
-                    {{ pupil.last_name }}
-                    {{ pupil.first_name }}
-                    {{ pupil.middle_name }}
-                </option>
-            {% endfor %}
-        </select>
-        <br>
-        <input type="date" name="day" placeholder="Дата" required>
-        <br>
-    {# TODO: "time" input should be active only if "Прогул" chose in "cause" select #}
-        <input type="number" name="time" placeholder="Час запізнення" value="0" required>
-        <br>
-        <button type="submit">Зберегти</button>
-    </form>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="cause">Причина отсутствия</label>
+                        <select id="cause" name="cause" required class="form-control">
+                            {% for cause in causes %}
+                                <option value="{{ cause.0 }}">
+                                    {{ cause.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pupil">ФИО ученика</label>
+                        <select id="pupil" name="pupil" required class="form-control">
+                            {% for pupil in pupils %}
+                                <option value="{{ pupil.id }}">
+                                    {{ pupil.last_name }}
+                                    {{ pupil.first_name }}
+                                    {{ pupil.middle_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="day">Дата</label>
+                        <input type="date" name="day" id="day" placeholder="Дата" required class="form-control">
+                    </div>
+                    {# TODO: "time" input should be active only if "Прогул" chose in "cause" select #}
+                    <div class="form-group">
+                        <label for="time">Час запізнення</label>
+                        <input type="number" id="time" name="time" placeholder="Час запізнення" value="0" required
+                               class="form-control" disabled>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Зберегти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('cause').addEventListener('change', function (event) {
+            var timeEl = document.getElementById('time');
+            var id = event.target.value;
+            if (id === '2') {
+                timeEl.removeAttribute('disabled');
+            } else {
+                timeEl.setAttribute('disabled', '');
+            }
+        })
+    </script>
 
 {% endblock %}

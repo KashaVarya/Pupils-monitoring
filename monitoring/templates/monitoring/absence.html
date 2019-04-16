@@ -1,37 +1,43 @@
 {% extends "monitoring/wrapper.html" %}
 
 {% block main %}
-    <h1>Списки відсутніх</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1 class="my-4">Списки відсутніх</h1>
 
-    <table>
-        <thead>
-        <tr>
-            <td>ПІБ учня</td>
-            <td>Дата</td>
-            <td>Причина</td>
-            <td>Час запізнення</td>
-        </tr>
-        </thead>
-        <tbody>
-        {% for pupil in absence %}
-            <tr>
-                <td>
-                    {{ pupil.pupil.last_name }}
-                    {{ pupil.pupil.first_name }}
-                    {{ pupil.pupil.middle_name }}
-                </td>
-                <td>{{ pupil.day }} </td>
-                <td>{{ pupil.get_cause_display }} </td>
-                <td>
-                    {% if pupil.time %}
-                        {{ pupil.time }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                <table class="table table-striped table-responsive-sm">
+                    <thead>
+                    <tr>
+                        <th>ПІБ учня</th>
+                        <th>Дата</th>
+                        <th>Причина</th>
+                        <th>Час запізнення</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for pupil in absence %}
+                        <tr>
+                            <td>
+                                {{ pupil.pupil.last_name }}
+                                {{ pupil.pupil.first_name }}
+                                {{ pupil.pupil.middle_name }}
+                            </td>
+                            <td>{{ pupil.day }} </td>
+                            <td>{{ pupil.get_cause_display }} </td>
+                            <td>
+                                {% if pupil.time %}
+                                    {{ pupil.time }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

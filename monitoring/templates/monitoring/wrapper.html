@@ -1,20 +1,58 @@
+{% load static %}
+{% load monitoring_extras %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Облік учнів</title>
+    <link rel="stylesheet" href="{% static 'monitoring/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'monitoring/css/style.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <a href="/">Головна</a>
-    <a href="pupils">База учнів</a>
-    <a href="teachers">База співробітників</a>
-    <a href="absence">Списки відсутніх</a>
-    <a href="add_absence">Внести відсутніх</a>
-    <a href="add_group">Заповнити анкету про стан здоров'я учня</a>
-    <a href="add_discount">Заповнити анкету про пільги на харчування</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'main page' %}">Pupils</a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item {% active 'main page' %}">
+                <a class="nav-link" href="{% url 'main page' %}">Головна</a>
+            </li>
+            <li class="nav-item {% active 'pupils base' %}">
+                <a class="nav-link" href="{% url 'pupils base' %}">База учнів</a>
+            </li>
+            <li class="nav-item {% active 'teachers base' %}">
+                <a class="nav-link" href="{% url 'teachers base' %}">База співробітників</a>
+            </li>
+            <li class="nav-item {% active 'absence base' %}">
+                <a class="nav-link" href="{% url 'absence base' %}">Списки відсутніх</a>
+            </li>
+            <li class="nav-item {% active 'add absence' %}">
+                <a class="nav-link" href="{% url 'add absence' %}">Внести відсутніх</a>
+            </li>
+            <li class="nav-item {% active 'add group' %}">
+                <a class="nav-link" href="{% url 'add group' %}">Заповнити анкету про стан здоров'я учня</a>
+            </li>
+            <li class="nav-item {% active 'add discount' %}">
+                <a class="nav-link" href="{% url 'add discount' %}">Заповнити анкету про пільги на харчування</a>
+            </li>
+        </ul>
+    </div>
+</nav>
 
 {% block main %}
 {% endblock %}
+
+<script src="{% static 'monitoring/js/jquery-3.3.1.slim.min.js' %}"></script>
+<script src="{% static 'monitoring/js/popper-1.14.7.min.js' %}"></script>
+<script src="{% static 'monitoring/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'monitoring/js/script.js' %}"></script>
 
 </body>
 </html>

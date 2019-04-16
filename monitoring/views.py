@@ -181,10 +181,10 @@ class AddAbsenceView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        cause = request.POST.get('cause').split()[0]
+        cause = request.POST.get('cause')
         day = request.POST.get('day')
         time = request.POST.get('time')
-        pupil = request.POST.get('pupil').split()[0]
+        pupil = request.POST.get('pupil')
 
         AbsenceModel.objects.create(
             cause=cause,
@@ -211,8 +211,8 @@ class AddGroupView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        pupil_id = request.POST.get('pupil').split()[0]
-        group = request.POST.get('group').split()[0]
+        pupil_id = request.POST.get('pupil')
+        group = request.POST.get('group')
 
         pupil = PupilModel.objects.get(id=pupil_id)
         pupil.group = group
@@ -236,8 +236,8 @@ class AddDiscountView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        pupil_id = request.POST.get('pupil').split()[0]
-        discount = request.POST.get('discount').split()[0]
+        pupil_id = request.POST.get('pupil')
+        discount = request.POST.get('discount')
 
         pupil = PupilModel.objects.get(id=pupil_id)
         pupil.discount = discount

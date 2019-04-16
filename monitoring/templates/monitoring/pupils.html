@@ -1,116 +1,130 @@
 {% extends "monitoring/wrapper.html" %}
 
 {% block main %}
-    <h1>База учнів</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1 class="my-4">База учнів</h1>
+            </div>
+        </div>
 
-    <div>
-        <a href="pupils_archive">
-            <button type="submit">
-                Завантажити архів усіх учнів, які коли-небудь навчалися у школі
-            </button>
-        </a>
-    </div>
+        <div class="row ">
+            <div class="col text-right">
 
-    <div>
-        <select id="class-select">
-            <option disabled selected>Оберiть клас</option>
-            <option value="0">Усі класи</option>
-            {% for class in classes %}
-                <option value="{{ class.id }}">{{ class.name }}</option>
-            {% endfor %}
-        </select>
-    <button onclick="printFunction()">Роздрукувати список класу</button>
-    </div>
+            </div>
+        </div>
 
-    <div>
-        <select id="group-select">
-            <option disabled selected>Оберiть групу по фізичній культурі</option>
-            <option value="0">Усі групи</option>
-            {% for group in groups %}
-                <option value="{{ group.0 }}">{{ group.1 }}</option>
-            {% endfor %}
-        </select>
-    </div>
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-6">
+                <div class="mb-2">
+                    <a href="{% url 'download pupils archive' %}">
+                        <button class="btn btn-primary w-100">
+                            Завантажити архів усіх учнів, які коли-небудь навчалися у школі
+                        </button>
+                    </a>
+                </div>
 
-    <div>
-        <select id="vision-select">
-            <option disabled selected>Чи наявні вади зору?</option>
-            <option value="0">Усі учні</option>
-            <option value="True">Так</option>
-            <option value="False">Ні</option>
-        </select>
-    </div>
+                <div class="d-flex">
+                    <select id="class-select" class="form-control">
+                        <option disabled selected>Оберiть клас</option>
+                        <option value="0">Усі класи</option>
+                        {% for class in classes %}
+                            <option value="{{ class.id }}">{{ class.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button onclick="printFunction()" id="print-list" class="btn btn-primary ml-4 flex-md-shrink-0">
+                        Роздрукувати список класу
+                    </button>
+                </div>
 
-    <div>
-        <select id="discount-select">
-            <option disabled selected>Оберiть вид пільги на харчування</option>
-            <option value="0">Усі учні</option>
-            {% for discount in discounts %}
-                <option value="{{ discount.0 }}">{{ discount.1 }}</option>
-            {% endfor %}
-        </select>
-    </div>
+                <select id="group-select" class="form-control my-2">
+                    <option disabled selected>Оберiть групу по фізичній культурі</option>
+                    <option value="0">Усі групи</option>
+                    {% for group in groups %}
+                        <option value="{{ group.0 }}">{{ group.1 }}</option>
+                    {% endfor %}
+                </select>
 
-    <span>Для сортування рядків таблиці натисніть на заголовок стовбця.</span>
+                <select id="vision-select" class="form-control my-2">
+                    <option disabled selected>Чи наявні вади зору?</option>
+                    <option value="0">Усі учні</option>
+                    <option value="True">Так</option>
+                    <option value="False">Ні</option>
+                </select>
 
-    <table id="pupilsTable">
-        <thead>
-        <tr>
-            <th onclick="sortTable(0)">ПІБ</th>
-            <th onclick="sortTable(1)">День народження</th>
-            <th onclick="sortTable(2)">Стать</th>
-            <th onclick="sortTable(3)">Адреса</th>
-            <th onclick="sortTable(4)">Телефон</th>
-            <th onclick="sortTable(5)">Група по фізичній культурі</th>
-            <th onclick="sortTable(6)">Дефекти зору</th>
-            <th onclick="sortTable(7)">Пільги на харчування</th>
-            <th onclick="sortTable(8)">Клас</th>
-            <th onclick="sortTable(9)">Батьки</th>
-        </tr>
-        </thead>
+                <select id="discount-select" class="form-control my-2">
+                    <option disabled selected>Оберiть вид пільги на харчування</option>
+                    <option value="0">Усі учні</option>
+                    {% for discount in discounts %}
+                        <option value="{{ discount.0 }}">{{ discount.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
 
-        <tbody>
-        {% for pupil in pupils %}
-            <tr
-                    data-cls="{{ pupil.pupil_class.id }}"
-                    data-group="{{ pupil.group }}"
-                    data-vision="{{ pupil.vision_defect }}"
-                    data-discount="{{ pupil.discount }}"
-                    class="pupil-row"
-                    id="{{ pupil.id }}"
-            >
-                <td>
-                    {{ pupil.last_name }}
-                    {{ pupil.first_name }}
-                    {{ pupil.middle_name }}
-                </td>
-                <td>{{ pupil.birthday }}</td>
-                <td>{{ pupil.get_gender_display }}</td>
-                <td>{{ pupil.address }}</td>
-                <td>{{ pupil.phone }}</td>
-                <td>{{ pupil.get_group_display }}</td>
-                <td>
-                    {% if pupil.vision_defect %}
-                        Є
-                    {% else %}
-                        Немає
-                    {% endif %}
-                </td>
-                <td>{{ pupil.get_discount_display }}</td>
-                <td>{{ pupil.pupil_class.name }}</td>
-                {% for parent in pupil.parent.all %}
-                    <td>
-                        {{ parent.last_name }}
-                        {{ parent.first_name }}
-                        {{ parent.middle_name }},
-                        {{ parent.job_place }},
-                        {{ parent.phone }}
-                    </td>
-                {% endfor %}
+        <span>Для сортування рядків таблиці натисніть на заголовок стовбця.</span>
+
+        <table id="pupilsTable" class="table table-striped table-responsive-lg">
+            <thead>
+            <tr>
+                <th onclick="sortTable(0)">ПІБ</th>
+                <th onclick="sortTable(1)">День народження</th>
+                <th onclick="sortTable(2)">Стать</th>
+                <th onclick="sortTable(3)">Адреса</th>
+                <th onclick="sortTable(4)">Телефон</th>
+                <th onclick="sortTable(5)">Група по фізичній культурі</th>
+                <th onclick="sortTable(6)">Дефекти зору</th>
+                <th onclick="sortTable(7)">Пільги на харчування</th>
+                <th onclick="sortTable(8)">Клас</th>
+                <th onclick="sortTable(9)">Батьки</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+
+            <tbody>
+            {% for pupil in pupils %}
+                <tr
+                        data-cls="{{ pupil.pupil_class.id }}"
+                        data-group="{{ pupil.group }}"
+                        data-vision="{{ pupil.vision_defect }}"
+                        data-discount="{{ pupil.discount }}"
+                        class="pupil-row"
+                        id="{{ pupil.id }}"
+                >
+                    <td>
+                        {{ pupil.last_name }}
+                        {{ pupil.first_name }}
+                        {{ pupil.middle_name }}
+                    </td>
+                    <td>{{ pupil.birthday }}</td>
+                    <td>{{ pupil.get_gender_display }}</td>
+                    <td>{{ pupil.address }}</td>
+                    <td>{{ pupil.phone }}</td>
+                    <td>{{ pupil.get_group_display }}</td>
+                    <td>
+                        {% if pupil.vision_defect %}
+                            Є
+                        {% else %}
+                            Немає
+                        {% endif %}
+                    </td>
+                    <td>{{ pupil.get_discount_display }}</td>
+                    <td>{{ pupil.pupil_class.name }}</td>
+                    {% for parent in pupil.parent.all %}
+                        <td>
+                            {{ parent.last_name }}
+                            {{ parent.first_name }}
+                            {{ parent.middle_name }},
+                            {{ parent.job_place }},
+                            {{ parent.phone }}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+    </div>
 
     <script>
         function sortTable(n) {
@@ -130,12 +144,12 @@
                     x = rows[i].getElementsByTagName("td")[n];
                     y = rows[i + 1].getElementsByTagName("td")[n];
 
-                    if (dir == "asc") {
+                    if (dir === "asc") {
                         if (x.innerHTML.toLocaleLowerCase() > y.innerHTML.toLocaleLowerCase()) {
                             shouldSwitch = true;
                             break;
                         }
-                    } else if (dir == "desc") {
+                    } else if (dir === "desc") {
                         if (x.innerHTML.toLocaleLowerCase() < y.innerHTML.toLocaleLowerCase()) {
                             shouldSwitch = true;
                             break;
@@ -148,7 +162,7 @@
 
                     switchcount++;
                 } else {
-                    if (switchcount == 0 && dir == "asc") {
+                    if (switchcount === 0 && dir === "asc") {
                         dir = "desc";
                         switching = true;
                     }
