@@ -75,7 +75,8 @@ class MainView(TemplateView):
             'from monitoring_absencemodel as abs '
             'where abs.day = current_date '
             'group by abs.cause;'
-        ).fetchall()
+        )
+        abs_gisto = abs_gisto.fetchall() if abs_gisto is not None else []
 
         data_names = [
             'Хвороба',
