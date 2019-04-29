@@ -63,7 +63,7 @@ class MainView(TemplateView):
             abs_pupils += abs[cls.id][0]
             warn = warn + 1 if perc_class > 20 else warn
 
-        perc_pupils = abs_pupils * 100 / all_pupils
+        perc_pupils = abs_pupils * 100 / all_pupils if all_pupils > 0 else 0
         perc_cls = warn * 100 / class_model.__len__()
         context['classes'] = classes
         context['all'] = all_pupils
