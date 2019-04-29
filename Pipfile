@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 django = "*"
 matplotlib = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
