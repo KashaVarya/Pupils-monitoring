@@ -21,7 +21,7 @@ class MainView(TemplateView):
             'from monitoring_absencemodel as absc '
             'inner join monitoring_pupilmodel as pupils '
             'on absc.pupil_id=pupils.id '
-            'where absc.day = date() '
+            'where absc.day = current_date '
             'group by pupils.pupil_class_id;'
         ).fetchall()
 
@@ -71,7 +71,7 @@ class MainView(TemplateView):
         abs_gisto = cursor.execute(
             'select count(abs.cause) '
             'from monitoring_absencemodel as abs '
-            'where abs.day = date() '
+            'where abs.day = current_date '
             'group by abs.cause;'
         ).fetchall()
 
