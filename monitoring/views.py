@@ -23,7 +23,8 @@ class MainView(TemplateView):
             'on absc.pupil_id=pupils.id '
             'where absc.day = current_date '
             'group by pupils.pupil_class_id;'
-        ).fetchall()
+        )
+        data_abs = data_abs.fetchall() if data_abs is not None else []
 
         data_cls = cursor.execute(
             'select pupils.pupil_class_id, count(pupils.id) '
@@ -31,7 +32,8 @@ class MainView(TemplateView):
             'inner join monitoring_classmodel as cls '
             'on pupils.pupil_class_id=cls.id '
             'group by pupils.pupil_class_id;'
-        ).fetchall()
+        )
+        data_cls = data_cls.fetchall() if data_cls is not None else []
 
         abs = dict()
         class_model = set(ClassModel.objects.all())
