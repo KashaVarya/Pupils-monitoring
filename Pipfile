@@ -8,6 +8,7 @@ django = "*"
 matplotlib = "*"
 python-dotenv = "*"
 dj-database-url = "*"
+"psycopg2" = "*"
 
 [dev-packages]
 
