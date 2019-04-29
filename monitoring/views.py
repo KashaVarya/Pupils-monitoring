@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 import matplotlib.pyplot as plt
-import sqlite3
+from django.db import connection
 from zipfile import ZipFile
 from django.shortcuts import redirect
 from django.http import FileResponse
@@ -15,8 +15,6 @@ class MainView(TemplateView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        connection = sqlite3.connect('db.sqlite3')
         cursor = connection.cursor()
         data_abs = cursor.execute(
             'select pupils.pupil_class_id, count(pupils.id) '
@@ -247,8 +245,6 @@ class AddDiscountView(TemplateView):
 
 
 def pupils_archive_view(request):
-    connection = sqlite3.connect('db.sqlite3')
-
     with open('pupils.csv', 'wb') as file:
         cursor = connection.cursor()
         for row in cursor.execute('SELECT * FROM monitoring_pupilmodel'):
