@@ -184,7 +184,7 @@ class AddAbsenceView(TemplateView):
     def post(self, request, *args, **kwargs):
         cause = request.POST.get('cause')
         day = request.POST.get('day')
-        time = request.POST.get('time')
+        time = request.POST.get('time', 0)
         pupil = request.POST.get('pupil')
 
         AbsenceModel.objects.create(
