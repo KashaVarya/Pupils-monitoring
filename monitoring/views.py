@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import json
+from datetime import date
+
 import matplotlib.pyplot as plt
+from django.core import serializers
 from django.db import connection
 from zipfile import ZipFile
 from django.shortcuts import redirect
@@ -173,24 +177,34 @@ class AddAbsenceView(TemplateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        classes = ClassModel.objects.order_by('id').all()
         pupils = PupilModel.objects.all()
         causes = AbsenceModel._meta.get_field('cause').choices
 
+        today = date.today().strftime('%d/%m/%Y')
+
+        context['classes'] = classes
         context['pupils'] = pupils
         context['causes'] = causes
+
+        context['causes_json'] = json.dumps(causes)
+        context['classes_json'] = serializers.serialize('json', classes)
+        context['pupils_json'] = serializers.serialize('json', pupils)
+
+        context['today'] = today
 
         return context
 
     def post(self, request, *args, **kwargs):
         cause = request.POST.get('cause')
         day = request.POST.get('day')
-        time = request.POST.get('time', 0)
+        lessons_skipped = request.POST.get('lessons_skipped')
         pupil = request.POST.get('pupil')
 
         AbsenceModel.objects.create(
             cause=cause,
             day=day,
-            time=time,
+            lessons_skipped=lessons_skipped,
             pupil=PupilModel.objects.get(id=pupil),
         ).save()
 

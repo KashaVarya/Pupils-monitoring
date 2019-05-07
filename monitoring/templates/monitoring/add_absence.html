@@ -3,14 +3,26 @@
 {% block main %}
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div class="col-md-6" id="app">
                 <h1 class="my-4">Внести відсутніх</h1>
 
                 <form method="post">
                     {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="day">Дата</label>
+                        <input type="text" name="day" id="day"
+                               placeholder="дд/мм/рррр"
+                               value="{{ today }}"
+                               required
+                               class="form-control"
+                               pattern="\d{2}\/\d{2}\/\d{4}"
+                        >
+                    </div>
+
                     <div class="form-group">
                         <label for="cause">Причина відсутності</label>
-                        <select id="cause" name="cause" required class="form-control">
+                        <select id="cause" name="cause" required class="form-control" v-model="currentCause">
                             {% for cause in causes %}
                                 <option value="{{ cause.0 }}">
                                     {{ cause.1 }}
@@ -18,44 +30,92 @@
                             {% endfor %}
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label for="pupil">ПІП учня</label>
-                        <select id="pupil" name="pupil" required class="form-control">
-                            {% for pupil in pupils %}
-                                <option value="{{ pupil.id }}">
-                                    {{ pupil.last_name }}
-                                    {{ pupil.first_name }}
-                                    {{ pupil.middle_name }}
+                        <label for="class">Клас</label>
+                        <select id="class" name="class" required class="form-control" v-model="currentCls">
+                            {% for cls in classes %}
+                                <option value="{{ cls.id }}">
+                                    {{ cls.name }}
                                 </option>
                             {% endfor %}
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label for="day">Дата</label>
-                        <input type="date" name="day" id="day" placeholder="Дата" required class="form-control">
+                        <label for="pupil">ПІП учня</label>
+                        <select id="pupil" name="pupil" required class="form-control">
+                            <option :value="pupil.pk" v-for="pupil in pupilsByClass">
+                                [[ pupil.fields.last_name ]]
+                                [[ pupil.fields.first_name ]]
+                                [[ pupil.fields.middle_name ]]
+                            </option>
+                        </select>
                     </div>
+
                     {# TODO: "time" input should be active only if "Прогул" chose in "cause" select #}
                     <div class="form-group">
-                        <label for="time">Час запізнення</label>
-                        <input type="number" id="time" name="time" placeholder="Час запізнення" value="0" required
-                               class="form-control" disabled>
+                        <label for="time">Пропущено уроків</label>
+                        <input type="number"
+                               min="0"
+                               max="7"
+                               value="0"
+                               id="lessons_skipped"
+                               name="lessons_skipped"
+                               placeholder="0"
+                               required
+                               class="form-control"
+                               :disabled="disableLessonsInput"
+                        >
                     </div>
                     <button type="submit" class="btn btn-primary">Зберегти</button>
                 </form>
             </div>
         </div>
     </div>
+{% endblock %}
 
+{% block scripts %}
     <script>
-        document.getElementById('cause').addEventListener('change', function (event) {
-            var timeEl = document.getElementById('time');
-            var id = event.target.value;
-            if (id === '2') {
-                timeEl.removeAttribute('disabled');
-            } else {
-                timeEl.setAttribute('disabled', '');
+        $('#day').datepicker({
+            language: 'uk',
+            format: 'dd/mm/yyyy'
+        });
+
+        var causes = {{ causes_json | safe }}
+        var classes = {{ classes_json | safe }}
+        var pupils = {{ pupils_json | safe }}
+
+        var app = new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data() {
+                return {
+                    causes: causes,
+                    currentCause: causes[0][0],
+                    classes: classes,
+                    pupils: pupils,
+                    currentCls: classes[0].pk
+                }
+            },
+
+            computed: {
+                cls() {
+                    return this.classes.find(c => c.pk === parseInt(this.currentCls))
+                },
+
+                cause() {
+                    return this.causes.find(c => c[0] === parseInt(this.currentCause))
+                },
+
+                disableLessonsInput() {
+                    return parseInt(this.currentCause) === 1
+                },
+
+                pupilsByClass() {
+                    return this.pupils.filter(p => p.fields.pupil_class === this.cls.pk)
+                }
             }
         })
     </script>
-
 {% endblock %}

@@ -91,8 +91,9 @@ class AbsenceModel(models.Model):
         default=1,
     )
     day = models.DateField()
-    time = models.IntegerField(
+    lessons_skipped = models.IntegerField(
         default=0,
+        null=True
     )
     pupil = models.ForeignKey(
         PupilModel,
