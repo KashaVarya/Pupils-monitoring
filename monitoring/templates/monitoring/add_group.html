@@ -10,7 +10,7 @@
                     {% csrf_token %}
 
                     <div class="form-group">
-                        <label for="pupil">ФИО ученика</label>
+                        <label for="pupil">ПІП учня</label>
                         <select id="pupil" class="form-control" name="pupil" required>
                             {% for pupil in pupils %}
                                 <option value="{{ pupil.id }}">
@@ -22,7 +22,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="group">Группа</label>
+                        <label for="group">Група</label>
                         <select id="group" class="form-control" name="group" required>
                             {% for group in groups %}
                                 <option value="{{ group.0 }}">

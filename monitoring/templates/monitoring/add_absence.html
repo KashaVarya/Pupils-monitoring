@@ -4,12 +4,12 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <h1 class="my-4">Внести вісутніх</h1>
+                <h1 class="my-4">Внести відсутніх</h1>
 
                 <form method="post">
                     {% csrf_token %}
                     <div class="form-group">
-                        <label for="cause">Причина отсутствия</label>
+                        <label for="cause">Причина відсутності</label>
                         <select id="cause" name="cause" required class="form-control">
                             {% for cause in causes %}
                                 <option value="{{ cause.0 }}">
@@ -19,7 +19,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="pupil">ФИО ученика</label>
+                        <label for="pupil">ПІП учня</label>
                         <select id="pupil" name="pupil" required class="form-control">
                             {% for pupil in pupils %}
                                 <option value="{{ pupil.id }}">
