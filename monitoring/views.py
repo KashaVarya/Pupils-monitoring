@@ -67,7 +67,7 @@ class MainView(TemplateView):
         perc_cls = warn * 100 / class_model.__len__()
         context['classes'] = classes
         context['all'] = all_pupils
-        context['perc_pupils'] = perc_pupils
+        context['perc_pupils'] = round(perc_pupils)
         context['perc_cls'] = perc_cls
 
         abs_gisto = cursor.execute(
