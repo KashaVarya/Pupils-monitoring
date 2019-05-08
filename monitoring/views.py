@@ -219,18 +219,25 @@ class AddGroupView(TemplateView):
 
         pupils = PupilModel.objects.all()
         groups = PupilModel._meta.get_field('group').choices
+        classes = ClassModel.objects.order_by('id').all()
 
         context['pupils'] = pupils
         context['groups'] = groups
+        context['classes'] = classes
+
+        context['classes_json'] = serializers.serialize('json', classes)
+        context['pupils_json'] = serializers.serialize('json', pupils)
 
         return context
 
     def post(self, request, *args, **kwargs):
         pupil_id = request.POST.get('pupil')
         group = request.POST.get('group')
+        vision_defect = request.POST.get('vision_defect')
 
         pupil = PupilModel.objects.get(id=pupil_id)
         pupil.group = group
+        pupil.vision_defect = True if vision_defect == 'on' else False
         pupil.save()
 
         return redirect('/pupils')
@@ -242,11 +249,16 @@ class AddDiscountView(TemplateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        classes = ClassModel.objects.order_by('id').all()
         pupils = PupilModel.objects.all()
         discounts = PupilModel._meta.get_field('discount').choices
 
+        context['classes'] = classes
         context['pupils'] = pupils
         context['discounts'] = discounts
+
+        context['classes_json'] = serializers.serialize('json', classes)
+        context['pupils_json'] = serializers.serialize('json', pupils)
 
         return context
 

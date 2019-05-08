@@ -3,24 +3,34 @@
 {% block main %}
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div class="col-md-6" id="app">
                 <h1 class="my-4">Заповнити анкету про пільги на харчування</h1>
 
                 <form method="post">
                     {% csrf_token %}
 
                     <div class="form-group">
-                        <label for="pupil">ПІП учня</label>
-                        <select class="form-control" id="pupil" name="pupil" required>
-                            {% for pupil in pupils %}
-                                <option value="{{ pupil.id }}">
-                                    {{ pupil.last_name }}
-                                    {{ pupil.first_name }}
-                                    {{ pupil.middle_name }}
+                            <label for="class">Клас</label>
+                        <select id="class" name="class" required class="form-control" v-model="currentCls">
+                            {% for cls in classes %}
+                                <option value="{{ cls.id }}">
+                                    {{ cls.name }}
                                 </option>
                             {% endfor %}
                         </select>
                     </div>
+
+                    <div class="form-group">
+                        <label for="pupil">ПІП учня</label>
+                        <select id="pupil" name="pupil" required class="form-control">
+                            <option :value="pupil.pk" v-for="pupil in pupilsByClass">
+                                [[ pupil.fields.last_name ]]
+                                [[ pupil.fields.first_name ]]
+                                [[ pupil.fields.middle_name ]]
+                            </option>
+                        </select>
+                    </div>
+
                     <div class="form-group">
                         <label for="discount">Пільги</label>
                         <select class="form-control" id="discount" name="discount" required>
@@ -39,4 +49,33 @@
         </div>
     </div>
 
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        var classes = {{ classes_json | safe }}
+        var pupils = {{ pupils_json | safe }}
+
+        var app = new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data() {
+                return {
+                    classes: classes,
+                    pupils: pupils,
+                    currentCls: classes[0].pk
+                }
+            },
+
+            computed: {
+                cls() {
+                    return this.classes.find(c => c.pk === parseInt(this.currentCls))
+                },
+
+                pupilsByClass() {
+                    return this.pupils.filter(p => p.fields.pupil_class === this.cls.pk)
+                }
+            }
+        })
+    </script>
 {% endblock %}
