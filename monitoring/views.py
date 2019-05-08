@@ -60,7 +60,7 @@ class MainView(TemplateView):
             classes.append([
                 cls.id,
                 cls.name,
-                abs[cls.id][0],
+                round(abs[cls.id][0]),
                 perc_class
             ])
             all_pupils += abs[cls.id][1]
@@ -72,7 +72,7 @@ class MainView(TemplateView):
         context['classes'] = classes
         context['all'] = all_pupils
         context['perc_pupils'] = round(perc_pupils)
-        context['perc_cls'] = perc_cls
+        context['perc_cls'] = round(perc_cls)
 
         abs_gisto = cursor.execute(
             'select count(abs.cause) '
