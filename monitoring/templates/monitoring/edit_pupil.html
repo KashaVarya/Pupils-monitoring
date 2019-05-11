@@ -1,0 +1,144 @@
+{% extends "monitoring/wrapper.html" %}
+
+{% block main %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col s12 center-align">
+                <h1>Редагування учня</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <form method="POST" class="col s12">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="last_name">Прізвище</label>
+                    <input value="{{ pupil_data.last_name }}"
+                           name="last_name"
+                           id="last_name"
+                           type="text"
+                           class="form-control"
+                           maxlength="150"
+                           required
+                           autofocus
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="first_name">Iм'я</label>
+                    <input value="{{ pupil_data.first_name }}" name="first_name" id="first_name" type="text"
+                           class="form-control" maxlength="30" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="middle_name">По батькові</label>
+                    <input value="{{ pupil_data.middle_name }}" name="middle_name" id="middle_name" type="text"
+                           class="form-control" maxlength="64" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="birthday">День народження</label>
+                    <input value="{{ pupil_data.birthday }}" name="birthday" id="birthday" type="text"
+                           class="form-control" maxlength="150" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Телефон</label>
+                    <input value="{{ pupil_data.phone }}" id="phone" name="phone" type="tel" class="form-control"
+                           maxlength="20" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Адреса</label>
+                    <input value="{{ pupil_data.address }}" id="address" name="address" type="text" class="form-control"
+                           maxlength="20" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">Стать</label>
+                    <select name="gender" id="gender" class="form-control">
+                        {% for g in gender %}
+                            <option
+                                    {% if pupil_data.gender == g.0 %} selected {% endif %}
+                                                                      value="{{ g.0 }}">{{ g.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="group">Група по фізичній культурі</label>
+                    <select name="group" id="group" class="form-control">
+                        {% for g in groups %}
+                            <option {% if pupil_data.group == g.0 %} selected {% endif %}
+                                                                     value="{{ g.0 }}">{{ g.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="discount">Пільги на харчування</label>
+                    <select name="discount" id="discount" class="form-control">
+                        {% for d in discounts %}
+                            <option {% if pupil_data.discount == d.0 %} selected {% endif %}
+                                                                        value="{{ d.0 }}">{{ d.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="class">Клас</label>
+                    <select name="class" id="class" class="form-control">
+                        {% for c in classes %}
+                            <option {% if pupil_data.pupil_class.pk == c.pk %} selected {% endif %}
+                                                                               value="{{ c.pk }}"
+                            >
+                                {{ c.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="parents">Батьки</label>
+                    <select name="parents" id="parents" class="form-control" multiple>
+                        {% for p in parents %}
+                            <option
+                                    {% if p.pk in pupil_parents_pk %} selected {% endif %}
+                                                                      value="{{ p.pk }}"
+                            >
+                                {{ p.last_name }} {{ p.first_name }} {{ p.middle_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="vision_defect"
+                               id="vision_defect"
+                        >
+                        <label class="form-check-label" for="vision_defect">
+                            Вади зору
+                        </label>
+                    </div>
+                </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="input-field col s12 center-align">
+                <button class="btn btn-primary" type="submit" name="action">
+                    Редагувати данi учня
+                </button>
+            </div>
+        </div>
+
+        </form>
+    </div>
+
+
+    </div>
+{% endblock %}

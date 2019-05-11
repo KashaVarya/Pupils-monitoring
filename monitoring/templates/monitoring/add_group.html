@@ -10,7 +10,7 @@
                     {% csrf_token %}
 
                     <div class="form-group">
-                            <label for="class">Клас</label>
+                        <label for="class">Клас</label>
                         <select id="class" name="class" required class="form-control" v-model="currentCls">
                             {% for cls in classes %}
                                 <option value="{{ cls.id }}">
