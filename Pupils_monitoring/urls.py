@@ -20,14 +20,21 @@ from monitoring import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.MainView.as_view(), name='main page'),
+
     url(r'^pupils$', views.PupilsView.as_view(), name='pupils base'),
+    url(r'^pupils_archive$', views.pupils_archive_view, name='download pupils archive'),
+    url(r'^add_pupil$', views.AddPupilView.as_view(), name='add pupil'),
+    url(r'^edit_pupil/(?P<pk>\d+)$', views.EditPupilView.as_view(), name='edit_pupil'),
+    url(r'^delete_pupil$', views.DeletePupilView.as_view(), name='delete_pupil'),
+
     url(r'^teachers$', views.TeachersView.as_view(), name='teachers base'),
+    url(r'^add_teacher$', views.AddTeacherView.as_view(), name='add teacher'),
+    url(r'^edit_teacher/(?P<pk>\d+)$', views.EditTeacherView.as_view(), name='edit teacher'),
+    url(r'^delete_teacher$', views.AddTeacherView.as_view(), name='delete teacher'),
+
     url(r'^absence$', views.AbsenceView.as_view(), name='absence base'),
     url(r'^add_absence$', views.AddAbsenceView.as_view(), name='add absence'),
     url(r'^add_group$', views.AddGroupView.as_view(), name='add group'),
     url(r'^add_discount$', views.AddDiscountView.as_view(), name='add discount'),
-    url(r'^pupils_archive$', views.pupils_archive_view, name='download pupils archive'),
-    url(r'^edit_pupil/(?P<pk>\d+)$', views.EditPupilView.as_view(), name='edit_pupil'),
-    url(r'^delete_pupil$', views.DeletePupilView.as_view(), name='delete_pupil'),
-    url(r'^add_pupil$', views.AddPupilView.as_view(), name='add pupil'),
+
 ]

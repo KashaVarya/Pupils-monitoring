@@ -162,7 +162,7 @@ class TeachersView(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        teachers = TeacherModel.objects.all()
+        teachers = TeacherModel.objects.order_by('last_name', 'first_name', 'middle_name')
         context['teachers'] = teachers
 
         return context
@@ -431,3 +431,21 @@ class DeletePupilView(RedirectView):
         pupil = PupilModel.objects.get(id=pk)
         pupil.delete()
         return redirect('pupils base')
+
+
+class AddTeacherView(TemplateView):
+    def get(self):
+        pass
+
+
+class EditTeacherView(TemplateView):
+    def get(self):
+        pass
+
+
+class DeleteTeacherView(RedirectView):
+    def post(self, request, *args, **kwargs):
+        pk = request.POST.get('pk')
+        teacher = TeacherModel.objects.get(id=pk)
+        teacher.delete()
+        return redirect('teachers base')
