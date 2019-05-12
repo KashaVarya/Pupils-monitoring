@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'^teachers$', views.TeachersView.as_view(), name='teachers base'),
     url(r'^add_teacher$', views.AddTeacherView.as_view(), name='add teacher'),
     url(r'^edit_teacher/(?P<pk>\d+)$', views.EditTeacherView.as_view(), name='edit teacher'),
-    url(r'^delete_teacher$', views.AddTeacherView.as_view(), name='delete teacher'),
+    url(r'^delete_teacher$', views.DeleteTeacherView.as_view(), name='delete teacher'),
 
     url(r'^absence$', views.AbsenceView.as_view(), name='absence base'),
     url(r'^add_absence$', views.AddAbsenceView.as_view(), name='add absence'),

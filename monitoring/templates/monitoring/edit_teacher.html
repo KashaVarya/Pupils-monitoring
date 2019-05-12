@@ -1,0 +1,67 @@
+{% extends "monitoring/wrapper.html" %}
+
+{% block main %}
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h1>Редагування вчителя</h1>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form method="POST" class="col s12">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="last_name">Прізвище</label>
+                        <input value="{{ teacher_data.last_name }}"
+                               name="last_name"
+                               id="last_name"
+                               type="text"
+                               class="form-control"
+                               maxlength="150"
+                               required
+                               autofocus
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="first_name">Iм'я</label>
+                        <input value="{{ teacher_data.first_name }}" name="first_name" id="first_name" type="text"
+                               class="form-control" maxlength="30" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="middle_name">По батькові</label>
+                        <input value="{{ teacher_data.middle_name }}" name="middle_name" id="middle_name" type="text"
+                               class="form-control" maxlength="64" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="class">Клас</label>
+                        <select name="class" id="class" class="form-control" multiple>
+                            {% for c in classes %}
+                                <option
+                                        {% if c.pk in classes_pk %} selected {% endif %}
+                                                                    value="{{ c.pk }}"
+                                >
+                                    {{ c.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="row mb-5">
+                        <div class="input-field col s12 center-align">
+                            <button class="btn btn-primary" type="submit" name="action">
+                                Редагувати данi вчителя
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

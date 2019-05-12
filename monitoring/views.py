@@ -434,13 +434,72 @@ class DeletePupilView(RedirectView):
 
 
 class AddTeacherView(TemplateView):
-    def get(self):
-        pass
+    template_name = "monitoring/add_teacher.html"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        classes = set(ClassModel.objects.all())
+        context['classes'] = classes
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        middle_name = request.POST.get('middle_name')
+
+        teacher = TeacherModel.objects.create(
+            first_name=first_name,
+            last_name=last_name,
+            middle_name=middle_name,
+        )
+        teacher.save()
+
+        teacher.classmodel_set.add(ClassModel.objects.get(id=request.POST.get('class')))
+
+        return redirect('/teachers')
 
 
 class EditTeacherView(TemplateView):
-    def get(self):
-        pass
+    template_name = "monitoring/edit_teacher.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        teacher_id = self.kwargs.get('pk', None)
+        teacher = TeacherModel.objects.filter(id=teacher_id).first()
+        context['teacher_data'] = teacher
+
+        classes = set(ClassModel.objects.all())
+        context['classes'] = classes
+
+        classes_pk = [cls.pk for cls in classes if cls.teacher.pk == teacher.pk]
+        context['classes_pk'] = classes_pk
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        middle_name = request.POST.get('middle_name')
+        pupil_class = request.POST.getlist('class')
+
+        user_id = self.kwargs.get('pk', None)
+        teacher = TeacherModel.objects.filter(id=user_id)
+
+        teacher.update(
+            first_name=first_name,
+            last_name=last_name,
+            middle_name=middle_name,
+        )
+
+        for cls in pupil_class:
+            cl = ClassModel.objects.filter(id=int(cls)).get()
+            cl.teacher = teacher.get()
+            cl.save()
+
+        return redirect('/teachers')
 
 
 class DeleteTeacherView(RedirectView):
