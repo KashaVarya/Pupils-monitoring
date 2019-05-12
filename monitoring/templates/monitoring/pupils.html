@@ -17,6 +17,14 @@
         <div class="row justify-content-center mb-5">
             <div class="col-md-6">
                 <div class="mb-2">
+                    <a href="/add_pupil">
+                        <button class="btn btn-primary w-100">
+                            Додати нового учня
+                        </button>
+                    </a>
+                </div>
+
+                <div class="mb-2">
                     <a href="{% url 'download pupils archive' %}">
                         <button class="btn btn-primary w-100">
                             Завантажити архів усіх учнів, які коли-небудь навчалися у школі
@@ -115,15 +123,17 @@
                     </td>
                     <td>{{ pupil.get_discount_display }}</td>
                     <td>{{ pupil.pupil_class.name }}</td>
-                    {% for parent in pupil.parent.all %}
-                        <td>
+                    <td>
+                        {% for parent in pupil.parent.all %}
                             {{ parent.last_name }}
                             {{ parent.first_name }}
                             {{ parent.middle_name }},
                             {{ parent.job_place }},
                             {{ parent.phone }}
-                        </td>
-                    {% endfor %}
+
+                            <br><br>
+                        {% endfor %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -150,13 +160,16 @@
                     x = rows[i].getElementsByTagName("td")[n];
                     y = rows[i + 1].getElementsByTagName("td")[n];
 
+                    x_text = x.innerHTML.toLocaleLowerCase().trim()
+                    y_text = y.innerHTML.toLocaleLowerCase().trim()
+
                     if (dir === "asc") {
-                        if (x.innerHTML.toLocaleLowerCase() > y.innerHTML.toLocaleLowerCase()) {
+                        if (x_text > y_text) {
                             shouldSwitch = true;
                             break;
                         }
                     } else if (dir === "desc") {
-                        if (x.innerHTML.toLocaleLowerCase() < y.innerHTML.toLocaleLowerCase()) {
+                        if (x_text < y_text) {
                             shouldSwitch = true;
                             break;
                         }

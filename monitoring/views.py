@@ -325,13 +325,19 @@ class EditPupilView(TemplateView):
         gender = request.POST.get('gender')
         phone = request.POST.get('phone')
         group = request.POST.get('group')
-        vision_defect = request.POST.get('vision_defect')
+        vision_defect = True if request.POST.get('vision_defect') == 'on' else False
         discount = request.POST.get('discount')
-        pupil_class = request.POST.get('pupil_class')
-        parent = request.POST.get('parent')
+        pupil_class = request.POST.get('class')
+        parents = request.POST.getlist('parents')
 
         user_id = self.kwargs.get('pk', None)
         user = PupilModel.objects.filter(id=user_id)
+
+        user.get().parent.clear()
+        for parent in parents:
+            p = ParentModel.objects.filter(id=int(parent)).get()
+            user.get().parent.add(p)
+        user.get().save()
 
         user.update(
             first_name=first_name,
@@ -345,7 +351,66 @@ class EditPupilView(TemplateView):
             vision_defect=vision_defect,
             discount=discount,
             pupil_class=pupil_class,
-            parent=parent,
         )
+
+        return redirect('/pupils')
+
+
+class AddPupilView(TemplateView):
+    template_name = "monitoring/add_pupil.html"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        classes = set(ClassModel.objects.all())
+        context['classes'] = classes
+
+        groups = PupilModel._meta.get_field('group').choices
+        context['groups'] = groups
+
+        discounts = PupilModel._meta.get_field('discount').choices
+        context['discounts'] = discounts
+
+        gender = PupilModel._meta.get_field('gender').choices
+        context['gender'] = gender
+
+        parents = ParentModel.objects.order_by('last_name').all()
+        context['parents'] = parents
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        middle_name = request.POST.get('middle_name')
+        birthday = request.POST.get('birthday')
+        address = request.POST.get('address')
+        gender = request.POST.get('gender')
+        phone = request.POST.get('phone')
+        group = request.POST.get('group')
+        vision_defect = True if request.POST.get('vision_defect') == 'on' else False
+        discount = request.POST.get('discount')
+        pupil_class = ClassModel.objects.get(id=request.POST.get('class'))
+        parents = request.POST.getlist('parents')
+
+        pupil = PupilModel.objects.create(
+            first_name=first_name,
+            last_name=last_name,
+            middle_name=middle_name,
+            birthday=birthday,
+            phone=phone,
+            address=address,
+            gender=gender,
+            group=group,
+            vision_defect=vision_defect,
+            discount=discount,
+            pupil_class=pupil_class,
+        )
+        pupil.save()
+
+        for parent in parents:
+            p = ParentModel.objects.filter(id=int(parent)).get()
+            pupil.parent.add(p)
+        pupil.save()
 
         return redirect('/pupils')
