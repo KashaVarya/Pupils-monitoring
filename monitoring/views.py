@@ -10,7 +10,7 @@ from django.db import connection
 from zipfile import ZipFile
 from django.shortcuts import redirect
 from django.http import FileResponse
-from django.views.generic import TemplateView, ListView, View
+from django.views.generic import TemplateView, ListView, View, RedirectView
 from monitoring.models import PupilModel, TeacherModel, AbsenceModel, ClassModel, ParentModel
 
 
@@ -423,3 +423,11 @@ class AddPupilView(TemplateView):
         pupil.save()
 
         return redirect('/pupils')
+
+
+class DeletePupilView(RedirectView):
+    def post(self, request, *args, **kwargs):
+        pk = request.POST.get('pk')
+        pupil = PupilModel.objects.get(id=pk)
+        pupil.delete()
+        return redirect('pupils base')

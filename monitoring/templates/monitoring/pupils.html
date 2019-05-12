@@ -33,7 +33,7 @@
                 </div>
 
                 <div class="d-flex">
-                    <select id="class-select" class="form-control">
+                    <select id="class-select" class="form-control" v-model="filters.cls">
                         <option disabled selected>Оберiть клас</option>
                         <option value="0">Усі класи</option>
                         {% for class in classes %}
@@ -45,7 +45,7 @@
                     </button>
                 </div>
 
-                <select id="group-select" class="form-control my-2">
+                <select id="group-select" class="form-control my-2" v-model="filters.group">
                     <option disabled selected>Оберiть групу по фізичній культурі</option>
                     <option value="0">Усі групи</option>
                     {% for group in groups %}
@@ -53,14 +53,14 @@
                     {% endfor %}
                 </select>
 
-                <select id="vision-select" class="form-control my-2">
+                <select id="vision-select" class="form-control my-2" v-model="filters.vision">
                     <option disabled selected>Чи наявні вади зору?</option>
                     <option value="0">Усі учні</option>
-                    <option value="True">Так</option>
-                    <option value="False">Ні</option>
+                    <option value="1">Так</option>
+                    <option value="">Ні</option>
                 </select>
 
-                <select id="discount-select" class="form-control my-2">
+                <select id="discount-select" class="form-control my-2" v-model="filters.discount">
                     <option disabled selected>Оберiть вид пільги на харчування</option>
                     <option value="0">Усі учні</option>
                     {% for discount in discounts %}
@@ -86,12 +86,13 @@
                 <th @click="sortBy('discount')">Пільги на харчування</th>
                 <th @click="sortBy('className')">Клас</th>
                 <th>Батьки</th>
+                <th></th>
             </tr>
             </thead>
 
             <tbody>
                 <tr
-                    v-for="pupil in sortedPupils"
+                    v-for="pupil in filteredPupils"
                     :key="pupil.pk"
 
                     class="pupil-row"
@@ -111,12 +112,12 @@
                     <td>[[ gender(pupil) ]]</td>
                     <td>[[ pupil.fields.address ]]</td>
                     <td>[[ pupil.fields.phone ]]</td>
-                    <td>[[ group(pupil) ]]</td>
+                    <td>[[ group(pupil)[1] ]]</td>
                     <td v-if="pupil.fields.vision_defect">Є</td>
                     <td v-else>Немає</td>
                     </td>
-                    <td>[[ discount(pupil) ]]</td>
-                    <td>[[ className(pupil) ]]</td>
+                    <td>[[ discount(pupil)[1] ]]</td>
+                    <td>[[ getClass(pupil).fields.name ]]</td>
                     <td>
                         <template v-for="parent in getParents(pupil)">
                             [[ parent.fields.last_name ]]
@@ -126,6 +127,13 @@
                             [[ parent.fields.phone ]]
                             <br><br>
                         </template>
+                    </td>
+                    <td>
+                        <form action="/delete_pupil" method="post" @submit="onDelete">
+                            {% csrf_token %}
+                            <input type="hidden" name="pk" :value="pupil.pk">
+                            <button class="delete-icon"><i class="text-danger far fa-trash-alt"></i></button>
+                        </form>
                     </td>
                 </tr>
             </tbody>
@@ -143,100 +151,6 @@
         var groups = {{ groups_json | safe }}
         var discounts = {{ discounts_json | safe }}
         var genders = {{ genders | safe }}
-        /*function sortTable(n) {
-            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-
-            table = document.getElementById("pupilsTable");
-            switching = true;
-            dir = "asc";
-
-            while (switching) {
-                switching = false;
-                rows = table.rows;
-
-                for (i = 1; i < (rows.length - 1); i++) {
-                    shouldSwitch = false;
-
-                    x = rows[i].getElementsByTagName("td")[n];
-                    y = rows[i + 1].getElementsByTagName("td")[n];
-
-                    x_text = x.innerHTML.toLocaleLowerCase().trim()
-                    y_text = y.innerHTML.toLocaleLowerCase().trim()
-
-                    if (dir === "asc") {
-                        if (x_text > y_text) {
-                            shouldSwitch = true;
-                            break;
-                        }
-                    } else if (dir === "desc") {
-                        if (x_text < y_text) {
-                            shouldSwitch = true;
-                            break;
-                        }
-                    }
-                }
-                if (shouldSwitch) {
-                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                    switching = true;
-
-                    switchcount++;
-                } else {
-                    if (switchcount === 0 && dir === "asc") {
-                        dir = "desc";
-                        switching = true;
-                    }
-                }
-            }
-        }
-
-        (function () {
-            var filters = {
-                cls: '0',
-                group: '0',
-                vision: '0',
-                discount: '0'
-            };
-
-            function filterTable() {
-                Array.from(document.querySelectorAll('.pupil-row')).forEach((row) => {
-                    var cls = row.dataset.cls;
-                    var group = row.dataset.group;
-                    var vision = row.dataset.vision;
-                    var discount = row.dataset.discount;
-
-                    if (
-                        (filters.cls === '0' || cls === filters.cls) &&
-                        (filters.group === '0' || group === filters.group) &&
-                        (filters.vision === '0' || vision === filters.vision) &&
-                        (filters.discount === '0' || discount === filters.discount)
-                    ) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            }
-
-            document.getElementById('class-select').addEventListener('change', function (event) {
-                filters.cls = event.target.value;
-                filterTable();
-            });
-
-            document.getElementById('group-select').addEventListener('change', function (event) {
-                filters.group = event.target.value;
-                filterTable();
-            });
-
-            document.getElementById('vision-select').addEventListener('change', function (event) {
-                filters.vision = event.target.value;
-                filterTable();
-            });
-
-            document.getElementById('discount-select').addEventListener('change', function (event) {
-                filters.discount = event.target.value;
-                filterTable();
-            });
-        }());*/
 
         var app = new Vue({
             el: "#app",
@@ -251,6 +165,12 @@
                     discounts: discounts,
                     genders: genders,
                     parents: parents,
+                    filters: {
+                        cls: '0',
+                        group: '0',
+                        vision: '0',
+                        discount: '0'
+                    }
                 }
             },
 
@@ -278,10 +198,30 @@
 
                         return 0;
                     })
-                }
+                },
+
+                filteredPupils() {
+                    return this.sortedPupils.filter(pupil => {
+                        let cls = String(this.getClass(pupil).pk);
+                        let group = String(this.group(pupil)[0]);
+                        let vision = pupil.fields.vision_defect;
+                        let discount = String(this.discount(pupil)[0]);
+
+                        return (this.filters.cls === '0' || cls === this.filters.cls) &&
+                            (this.filters.group === '0' || group === this.filters.group) &&
+                            (this.filters.vision === '0' || vision === Boolean(this.filters.vision)) &&
+                            (this.filters.discount === '0' || discount === this.filters.discount);
+                    })
+                },
             },
 
             methods: {
+                onDelete(event) {
+                    if (!confirm("Видалити?")) {
+                        event.preventDefault();
+                    }
+                },
+
                 sortBy(sortKey) {
                     if (this.sortKey === sortKey) {
                         this.sortAsc = !this.sortAsc;
@@ -306,7 +246,7 @@
 
                 group(pupil) {
                     try {
-                        return this.groups.find(g => g[0] === pupil.fields.group)[1]
+                        return this.groups.find(g => g[0] === pupil.fields.group)
                     } catch(e) {
                         console.warn(e);
                         return '-'
@@ -315,19 +255,19 @@
 
                 discount(pupil) {
                     try {
-                        return this.discounts.find(d => d[0] === pupil.fields.discount)[1]
+                        return this.discounts.find(d => d[0] === pupil.fields.discount)
                     } catch(e) {
                         console.warn(e);
                         return '-'
                     }
                 },
 
-                className(pupil) {
+                getClass(pupil) {
                     try {
-                        return this.classes.find(c => c.pk === pupil.fields.pupil_class).fields.name
+                        return this.classes.find(c => c.pk === pupil.fields.pupil_class)
                     } catch(e) {
                         console.warn(e);
-                        return '-'
+                        return {pk: -1};
                     }
                 },
 

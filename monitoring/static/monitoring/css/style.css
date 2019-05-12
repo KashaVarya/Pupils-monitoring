@@ -1,0 +1,7 @@
+.delete-icon {
+    border: none;
+    outline: none;
+    background: none;
+    display: block;
+    cursor: pointer;
+}
