@@ -132,7 +132,8 @@ class PupilsView(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        pupils = PupilModel.objects.all()
+        pupils = PupilModel.objects.order_by('last_name', 'first_name', 'middle_name')
+        parents = ParentModel.objects.all()
         context['pupils'] = pupils
 
         classes = set(ClassModel.objects.all())
@@ -143,6 +144,14 @@ class PupilsView(ListView):
 
         discounts = PupilModel._meta.get_field('discount').choices
         context['discounts'] = discounts
+
+        genders = PupilModel._meta.get_field('gender').choices
+        context['parents'] = serializers.serialize('json', parents)
+        context['genders'] = json.dumps(genders)
+        context['classes_json'] = serializers.serialize('json', classes)
+        context['pupils_json'] = serializers.serialize('json', pupils)
+        context['groups_json'] = json.dumps(groups)
+        context['discounts_json'] = json.dumps(discounts)
 
         return context
 

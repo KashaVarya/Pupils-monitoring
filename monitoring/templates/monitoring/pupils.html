@@ -1,7 +1,7 @@
 {% extends "monitoring/wrapper.html" %}
 
 {% block main %}
-    <div class="container">
+    <div class="container" id="app">
         <div class="row">
             <div class="col">
                 <h1 class="my-4">База учнів</h1>
@@ -40,7 +40,7 @@
                             <option value="{{ class.id }}">{{ class.name }}</option>
                         {% endfor %}
                     </select>
-                    <button onclick="printFunction()" id="print-list" class="btn btn-primary ml-4 flex-md-shrink-0">
+                    <button @click="printFunction" id="print-list" class="btn btn-primary ml-4 flex-md-shrink-0">
                         Роздрукувати список класу
                     </button>
                 </div>
@@ -76,74 +76,74 @@
             <thead>
             <tr>
                 <th></th>
-                <th onclick="sortTable(0)">ПІБ</th>
-                <th onclick="sortTable(1)">День народження</th>
-                <th onclick="sortTable(2)">Стать</th>
-                <th onclick="sortTable(3)">Адреса</th>
-                <th onclick="sortTable(4)">Телефон</th>
-                <th onclick="sortTable(5)">Група по фізичній культурі</th>
-                <th onclick="sortTable(6)">Дефекти зору</th>
-                <th onclick="sortTable(7)">Пільги на харчування</th>
-                <th onclick="sortTable(8)">Клас</th>
-                <th onclick="sortTable(9)">Батьки</th>
+                <th @click="sortBy('name')">ПІБ</th>
+                <th @click="sortBy('birthday')">День народження</th>
+                <th @click="sortBy('gender')">Стать</th>
+                <th @click="sortBy('address')">Адреса</th>
+                <th @click="sortBy('phone')">Телефон</th>
+                <th @click="sortBy('group')">Група по фізичній культурі</th>
+                <th @click="sortBy('vision_defect')">Дефекти зору</th>
+                <th @click="sortBy('discount')">Пільги на харчування</th>
+                <th @click="sortBy('className')">Клас</th>
+                <th>Батьки</th>
             </tr>
             </thead>
 
             <tbody>
-            {% for pupil in pupils %}
                 <tr
-                        data-cls="{{ pupil.pupil_class.id }}"
-                        data-group="{{ pupil.group }}"
-                        data-vision="{{ pupil.vision_defect }}"
-                        data-discount="{{ pupil.discount }}"
-                        class="pupil-row"
-                        id="{{ pupil.id }}"
+                    v-for="pupil in sortedPupils"
+                    :key="pupil.pk"
+
+                    class="pupil-row"
+                    id="`pupil_${pupil.pk}`"
                 >
                     <td>
-                        <a href="/edit_pupil/{{ pupil.id }}" title="Редагувати">
+                        <a href="`/edit_pupil/${pupil.pk}`" title="Редагувати">
                             <i class="fas fa-pencil-alt"></i>
                         </a>
                     </td>
                     <td>
-                        {{ pupil.last_name }}
-                        {{ pupil.first_name }}
-                        {{ pupil.middle_name }}
+                        [[ pupil.fields.last_name ]]
+                        [[ pupil.fields.first_name ]]
+                        [[ pupil.fields.middle_name ]]
                     </td>
-                    <td>{{ pupil.birthday }}</td>
-                    <td>{{ pupil.get_gender_display }}</td>
-                    <td>{{ pupil.address }}</td>
-                    <td>{{ pupil.phone }}</td>
-                    <td>{{ pupil.get_group_display }}</td>
-                    <td>
-                        {% if pupil.vision_defect %}
-                            Є
-                        {% else %}
-                            Немає
-                        {% endif %}
+                    <td>[[ pupil.fields.birthday ]]</td>
+                    <td>[[ gender(pupil) ]]</td>
+                    <td>[[ pupil.fields.address ]]</td>
+                    <td>[[ pupil.fields.phone ]]</td>
+                    <td>[[ group(pupil) ]]</td>
+                    <td v-if="pupil.fields.vision_defect">Є</td>
+                    <td v-else>Немає</td>
                     </td>
-                    <td>{{ pupil.get_discount_display }}</td>
-                    <td>{{ pupil.pupil_class.name }}</td>
+                    <td>[[ discount(pupil) ]]</td>
+                    <td>[[ className(pupil) ]]</td>
                     <td>
-                        {% for parent in pupil.parent.all %}
-                            {{ parent.last_name }}
-                            {{ parent.first_name }}
-                            {{ parent.middle_name }},
-                            {{ parent.job_place }},
-                            {{ parent.phone }}
-
+                        <template v-for="parent in getParents(pupil)">
+                            [[ parent.fields.last_name ]]
+                            [[ parent.fields.first_name ]]
+                            [[ parent.fields.middle_name ]],
+                            [[ parent.fields.job_place ]],
+                            [[ parent.fields.phone ]]
                             <br><br>
-                        {% endfor %}
+                        </template>
                     </td>
                 </tr>
-            {% endfor %}
             </tbody>
         </table>
     </div>
     </div>
     </div>
+{% endblock %}
 
+{% block scripts %}
     <script>
-        function sortTable(n) {
+        var classes = {{ classes_json | safe }}
+        var parents = {{ parents | safe }}
+        var pupils = {{ pupils_json | safe }}
+        var groups = {{ groups_json | safe }}
+        var discounts = {{ discounts_json | safe }}
+        var genders = {{ genders | safe }}
+        /*function sortTable(n) {
             var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
 
             table = document.getElementById("pupilsTable");
@@ -236,12 +236,105 @@
                 filters.discount = event.target.value;
                 filterTable();
             });
-        }());
+        }());*/
 
-        function printFunction() {
-            window.print();
-        }
+        var app = new Vue({
+            el: "#app",
+            delimiters: ["[[", "]]"],
+            data() {
+                return {
+                    sortKey: 'name',
+                    sortAsc: true,
+                    classes: classes,
+                    pupils: pupils,
+                    groups: groups,
+                    discounts: discounts,
+                    genders: genders,
+                    parents: parents,
+                }
+            },
 
+            computed: {
+                sortedPupils() {
+                    return this.pupils.sort((a, b) => {
+                        let sortOrder = this.sortAsc ? 1 : -1;
+
+                        if (this.sortKey === 'name') {
+                            if (a.fields.last_name > b.fields.last_name) return sortOrder;
+                            if (a.fields.last_name < b.fields.last_name) return -sortOrder;
+
+                            if (a.fields.first_name > b.fields.first_name) return sortOrder;
+                            if (a.fields.first_name < b.fields.first_name) return -sortOrder;
+
+                            if (a.fields.middle_name > b.fields.middle_name) return sortOrder;
+                            if (a.fields.middle_name < b.fields.middle_name) return -sortOrder;
+                        } else {
+                            if (this.sortKey in a.fields) {
+                                return a.fields[this.sortKey] > b.fields[this.sortKey] ? sortOrder : -sortOrder;
+                            } else {
+                                return this[this.sortKey](a) > this[this.sortKey](b) ? sortOrder : -sortOrder;
+                            }
+                        }
+
+                        return 0;
+                    })
+                }
+            },
+
+            methods: {
+                sortBy(sortKey) {
+                    if (this.sortKey === sortKey) {
+                        this.sortAsc = !this.sortAsc;
+                    } else {
+                        this.sortAsc = true;
+                    }
+                    this.sortKey = sortKey;
+                },
+
+                printFunction() {
+                    window.print();
+                },
+
+                gender(pupil) {
+                    try {
+                        return this.genders.find(g => g[0] === pupil.fields.gender)[1]
+                    } catch(e) {
+                        console.warn(e);
+                        return '-'
+                    }
+                },
+
+                group(pupil) {
+                    try {
+                        return this.groups.find(g => g[0] === pupil.fields.group)[1]
+                    } catch(e) {
+                        console.warn(e);
+                        return '-'
+                    }
+                },
+
+                discount(pupil) {
+                    try {
+                        return this.discounts.find(d => d[0] === pupil.fields.discount)[1]
+                    } catch(e) {
+                        console.warn(e);
+                        return '-'
+                    }
+                },
+
+                className(pupil) {
+                    try {
+                        return this.classes.find(c => c.pk === pupil.fields.pupil_class).fields.name
+                    } catch(e) {
+                        console.warn(e);
+                        return '-'
+                    }
+                },
+
+                getParents(pupil) {
+                    return this.parents.filter(parent => pupil.fields.parent.includes(parent.pk))
+                }
+            }
+        })
     </script>
-
 {% endblock %}
