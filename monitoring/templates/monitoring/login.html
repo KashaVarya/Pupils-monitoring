@@ -1,0 +1,31 @@
+{% extends "monitoring/wrapper.html" %}
+
+{% block main %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6" id="app">
+                {% for message in messages %}
+                    <div class="row">
+                            <span style="color:#FF2D00;">
+                                {{ message }}
+                            </span>
+                    </div>
+                {% endfor %}
+
+                <h1 class="my-4">Підтвердіть, що ви відповідальна особа!</h1>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="password">Пароль</label>
+                        <input name="password" id="password" type="password"
+                               class="form-control" maxlength="50" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Підтвердити</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
