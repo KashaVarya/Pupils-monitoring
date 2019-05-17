@@ -12,7 +12,7 @@
                         <th>ПІБ учня</th>
                         <th>Дата</th>
                         <th>Причина</th>
-                        <th>Час запізнення</th>
+                        <th>Кількість пропущених уроків</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -26,8 +26,8 @@
                             <td>{{ pupil.day }} </td>
                             <td>{{ pupil.get_cause_display }} </td>
                             <td>
-                                {% if pupil.time %}
-                                    {{ pupil.time }}
+                                {% if pupil.lessons_skipped %}
+                                    {{ pupil.lessons_skipped }}
                                 {% else %}
                                     -
                                 {% endif %}

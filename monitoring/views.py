@@ -12,9 +12,28 @@ from django.shortcuts import redirect
 from django.http import FileResponse
 from django.views.generic import TemplateView, ListView, View, RedirectView
 from monitoring.models import PupilModel, TeacherModel, AbsenceModel, ClassModel, ParentModel
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
 
 
-class MainView(TemplateView):
+class LoginView(TemplateView):
+    template_name = 'monitoring/login.html'
+
+    def post(self, request, *args, **kwargs):
+        password = request.POST.get('password')
+        user = authenticate(username='admin', password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('/')
+        else:
+            messages.error(request, "Некоректне ім'я користувача або пароль!")
+            return redirect('/login')
+
+
+class MainView(LoginRequiredMixin, TemplateView):
+    login_url = '/login'
     template_name = "monitoring/index.html"
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -126,9 +145,10 @@ class MainView(TemplateView):
         return context
 
 
-class PupilsView(ListView):
+class PupilsView(LoginRequiredMixin, ListView):
     model = PupilModel
     template_name = "monitoring/pupils.html"
+    login_url = "/login"
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -156,9 +176,10 @@ class PupilsView(ListView):
         return context
 
 
-class TeachersView(ListView):
+class TeachersView(LoginRequiredMixin, ListView):
     model = TeacherModel
     template_name = "monitoring/teachers.html"
+    login_url = "/login"
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -168,9 +189,10 @@ class TeachersView(ListView):
         return context
 
 
-class AbsenceView(ListView):
+class AbsenceView(LoginRequiredMixin, ListView):
     model = AbsenceModel
     template_name = 'monitoring/absence.html'
+    login_url = "/login"
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -180,8 +202,9 @@ class AbsenceView(ListView):
         return context
 
 
-class AddAbsenceView(TemplateView):
+class AddAbsenceView(LoginRequiredMixin, TemplateView):
     template_name = 'monitoring/add_absence.html'
+    login_url = "/login"
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -190,7 +213,7 @@ class AddAbsenceView(TemplateView):
         pupils = PupilModel.objects.all()
         causes = AbsenceModel._meta.get_field('cause').choices
 
-        today = date.today().strftime('%d/%m/%Y')
+        today = date.today().strftime('%Y-%m-%d')
 
         context['classes'] = classes
         context['pupils'] = pupils
@@ -220,8 +243,9 @@ class AddAbsenceView(TemplateView):
         return redirect('/absence')
 
 
-class AddGroupView(TemplateView):
+class AddGroupView(LoginRequiredMixin, TemplateView):
     template_name = "monitoring/add_group.html"
+    login_url = "/login"
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -252,8 +276,9 @@ class AddGroupView(TemplateView):
         return redirect('/pupils')
 
 
-class AddDiscountView(TemplateView):
+class AddDiscountView(LoginRequiredMixin, TemplateView):
     template_name = "monitoring/add_discount.html"
+    login_url = "/login"
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -296,8 +321,9 @@ def pupils_archive_view(request):
     return FileResponse(open('pupils.zip', 'rb'), as_attachment=True)
 
 
-class EditPupilView(TemplateView):
+class EditPupilView(LoginRequiredMixin, TemplateView):
     template_name = "monitoring/edit_pupil.html"
+    login_url = "/login"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -365,8 +391,9 @@ class EditPupilView(TemplateView):
         return redirect('/pupils')
 
 
-class AddPupilView(TemplateView):
+class AddPupilView(LoginRequiredMixin, TemplateView):
     template_name = "monitoring/add_pupil.html"
+    login_url = "/login"
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -425,7 +452,9 @@ class AddPupilView(TemplateView):
         return redirect('/pupils')
 
 
-class DeletePupilView(RedirectView):
+class DeletePupilView(LoginRequiredMixin, RedirectView):
+    login_url = "/login"
+
     def post(self, request, *args, **kwargs):
         pk = request.POST.get('pk')
         pupil = PupilModel.objects.get(id=pk)
@@ -433,8 +462,9 @@ class DeletePupilView(RedirectView):
         return redirect('pupils base')
 
 
-class AddTeacherView(TemplateView):
+class AddTeacherView(LoginRequiredMixin, TemplateView):
     template_name = "monitoring/add_teacher.html"
+    login_url = "/login"
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -461,8 +491,9 @@ class AddTeacherView(TemplateView):
         return redirect('/teachers')
 
 
-class EditTeacherView(TemplateView):
+class EditTeacherView(LoginRequiredMixin, TemplateView):
     template_name = "monitoring/edit_teacher.html"
+    login_url = "/login"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -502,9 +533,38 @@ class EditTeacherView(TemplateView):
         return redirect('/teachers')
 
 
-class DeleteTeacherView(RedirectView):
+class DeleteTeacherView(LoginRequiredMixin, RedirectView):
+    login_url = "/login"
+
     def post(self, request, *args, **kwargs):
         pk = request.POST.get('pk')
         teacher = TeacherModel.objects.get(id=pk)
         teacher.delete()
         return redirect('teachers base')
+
+
+class ReportsView(LoginRequiredMixin, TemplateView):
+    template_name = "monitoring/reports.html"
+    login_url = "/login"
+
+
+class ReportGroupView(LoginRequiredMixin, TemplateView):
+    login_url = "/login"
+    template_name = "monitoring/report_group.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        cursor = connection.cursor()
+        osnov = cursor.execute('select count(id) from monitoring_pupilmodel where `group` = 1;').fetchone()[0]
+        podgot = cursor.execute('select count(id) from monitoring_pupilmodel where `group` = 2;').fetchone()[0]
+        spec = cursor.execute('select count(id) from monitoring_pupilmodel where `group` = 3;').fetchone()[0]
+
+        context['osnov'] = osnov
+        context['podgot'] = podgot
+        context['spec'] = spec
+        context['all'] = int(osnov) + int(podgot) + int(spec)
+
+        classes = [cls[0] for cls in cursor.execute('select name from monitoring_classmodel;').fetchall()]
+
+        return context

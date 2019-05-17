@@ -20,6 +20,7 @@ from monitoring import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.MainView.as_view(), name='main page'),
+    url(r'^login$', views.LoginView.as_view(), name='login'),
 
     url(r'^pupils$', views.PupilsView.as_view(), name='pupils base'),
     url(r'^pupils_archive$', views.pupils_archive_view, name='download pupils archive'),
@@ -36,5 +37,9 @@ urlpatterns = [
     url(r'^add_absence$', views.AddAbsenceView.as_view(), name='add absence'),
     url(r'^add_group$', views.AddGroupView.as_view(), name='add group'),
     url(r'^add_discount$', views.AddDiscountView.as_view(), name='add discount'),
+
+    url(r'^reports$', views.ReportsView.as_view(), name='reports'),
+    url(r'^report_group$', views.ReportGroupView.as_view(), name='report group'),
+
 
 ]
