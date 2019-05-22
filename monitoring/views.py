@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import json
+from collections import defaultdict
 from datetime import date
 
 import matplotlib.pyplot as plt
@@ -556,15 +557,46 @@ class ReportGroupView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         cursor = connection.cursor()
-        osnov = cursor.execute('select count(id) from monitoring_pupilmodel where `group` = 1;').fetchone()[0]
-        podgot = cursor.execute('select count(id) from monitoring_pupilmodel where `group` = 2;').fetchone()[0]
-        spec = cursor.execute('select count(id) from monitoring_pupilmodel where `group` = 3;').fetchone()[0]
+        osnov = cursor.execute('select count(id) '
+                               'from monitoring_pupilmodel '
+                               'where `group` = 1;'
+                               ).fetchone()[0]
+        podgot = cursor.execute('select count(id) '
+                                'from monitoring_pupilmodel '
+                                'where `group` = 2;'
+                                ).fetchone()[0]
+        spec = cursor.execute('select count(id) '
+                              'from monitoring_pupilmodel '
+                              'where `group` = 3;'
+                              ).fetchone()[0]
 
         context['osnov'] = osnov
         context['podgot'] = podgot
         context['spec'] = spec
         context['all'] = int(osnov) + int(podgot) + int(spec)
 
-        classes = [cls[0] for cls in cursor.execute('select name from monitoring_classmodel;').fetchall()]
+        classes = dict()
+        [classes.setdefault(cls[0], []) for cls in cursor.execute('select name '
+                                                                  'from monitoring_classmodel;'
+                                                                  ).fetchall()]
+
+        for i in range(1, 4):
+            for cls in classes:
+                group_count = cursor.execute("select count(p.id), c.name "
+                                             "from monitoring_pupilmodel as p "
+                                             "inner join monitoring_classmodel as c "
+                                             "on p.pupil_class_id=c.id "
+                                             "where p.`group`={} AND c.name='{}';".format(i, str(cls))
+                                             ).fetchone()
+
+                if group_count[0] != 0:
+                    classes[group_count[1]].append(group_count[0])
+                else:
+                    classes[cls].append(group_count[0])
+
+        for key, values in classes.items():
+            classes[key].append(int(values[0]) + int(values[1]) + int(values[2]))
+
+        context['classes'] = classes
 
         return context
