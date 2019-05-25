@@ -14,6 +14,13 @@ def add_admin(apps, schema_editor):
     user.save()
 
 
+def del_admin(apps, schema_editor):
+    UserModel = apps.get_model('auth', 'User')
+
+    user = UserModel.objects.get(username='admin')
+    user.delete()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -21,5 +28,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(add_admin)
+        migrations.RunPython(code=add_admin, reverse_code=del_admin)
     ]
