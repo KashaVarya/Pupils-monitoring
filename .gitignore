@@ -107,3 +107,4 @@ venv.bak/
 secret.py
 Pipfile.lock
 staticfiles
+monitoring/static/monitoring/absence.png
