@@ -1,0 +1,14 @@
+{% extends "monitoring/wrapper.html" %}
+
+{% block main %}
+    ЗВІТ<br>
+    наявність учнів пільгових категорій з харчування<br>
+    (кількісні показники)<br>
+    Всього по школі – {{ discount_all }}<br>
+
+    По класам:<br>
+    {% for key, values in classes.items %}
+        {{ key }} клас – {{ values.0 }}<br>
+    {% endfor %}
+
+{% endblock %}

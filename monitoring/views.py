@@ -548,6 +548,14 @@ class ReportsView(LoginRequiredMixin, TemplateView):
     template_name = "monitoring/reports.html"
     login_url = "/login"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        classes = set(ClassModel.objects.all())
+        context['classes'] = classes
+
+        return context
+
 
 class ReportGroupView(LoginRequiredMixin, TemplateView):
     login_url = "/login"
@@ -596,6 +604,44 @@ class ReportGroupView(LoginRequiredMixin, TemplateView):
 
         for key, values in classes.items():
             classes[key].append(int(values[0]) + int(values[1]) + int(values[2]))
+
+        context['classes'] = classes
+
+        return context
+
+
+class ReportFoodView(LoginRequiredMixin, TemplateView):
+    login_url = "/login"
+    template_name = "monitoring/report_food.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        cursor = connection.cursor()
+        discount_all = cursor.execute('select count(id) '
+                                      'from monitoring_pupilmodel '
+                                      'where discount <> 1;'
+                                      ).fetchone()[0]
+
+        context['discount_all'] = discount_all
+
+        classes = dict()
+        [classes.setdefault(cls[0], []) for cls in cursor.execute('select name '
+                                                                  'from monitoring_classmodel;'
+                                                                  ).fetchall()]
+
+        for cls in classes:
+            discount_count = cursor.execute("select count(p.id), c.name "
+                                            "from monitoring_pupilmodel as p "
+                                            "inner join monitoring_classmodel as c "
+                                            "on p.pupil_class_id=c.id "
+                                            "where p.discount <> 1 AND c.name='{}';".format(str(cls))
+                                            ).fetchone()
+
+            if discount_count[0] != 0:
+                classes[discount_count[1]].append(discount_count[0])
+            else:
+                classes[cls].append(discount_count[0])
 
         context['classes'] = classes
 

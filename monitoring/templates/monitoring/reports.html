@@ -2,9 +2,9 @@
 
 {% block main %}
     <div class="container" id="app">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="mb-2">
-                <h1 class="my-2">Звіти</h1>
+                <h1 class="my-2 text-center">Звіти</h1>
             </div>
         </div>
 
@@ -13,37 +13,71 @@
 
             </div>
         </div>
+        <br>
 
         <div class="row justify-content-center mb-5">
             <div class="col-md-6">
                 <div class="mb-2">
                     <a href="/report_group">
                         <button class="btn btn-primary w-100">
-                            Групи учнів за станом здоров’я
+                            Групи учнів за станом здоров’я загалом по школі
                         </button>
                     </a>
                 </div>
+                <br>
 
+                <select id="class-select" class="form-control">
+                    <option disabled selected>Оберiть клас</option>
+                    <option value="0">Усі класи</option>
+                    {% for class in classes %}
+                        <option value="{{ class.id }}">{{ class.name }}</option>
+                    {% endfor %}
+                </select>
                 <div class="mb-2">
                     <a href="/add_pupil">
                         <button class="btn btn-primary w-100">
-                            Додати нового учня
+                            Групи учнів за станом здоров’я окремо по класу
                         </button>
                     </a>
                 </div>
+                <br>
 
+                <select id="class-select" class="form-control">
+                    <option disabled selected>Оберiть клас</option>
+                    <option value="0">Усі класи</option>
+                    {% for class in classes %}
+                        <option value="{{ class.id }}">{{ class.name }}</option>
+                    {% endfor %}
+                </select>
                 <div class="mb-2">
                     <a href="/add_pupil">
                         <button class="btn btn-primary w-100">
-                            Додати нового учня
+                            Групи учнів за вадами зору окремо по класу
                         </button>
                     </a>
                 </div>
+                <br>
 
+                <div class="mb-2">
+                    <a href="/report_food">
+                        <button class="btn btn-primary w-100">
+                            Наявність учнів пільгових категорій з харчування загалом по школі
+                        </button>
+                    </a>
+                </div>
+                <br>
+
+                <select id="class-select" class="form-control">
+                    <option disabled selected>Оберiть клас</option>
+                    <option value="0">Усі класи</option>
+                    {% for class in classes %}
+                        <option value="{{ class.id }}">{{ class.name }}</option>
+                    {% endfor %}
+                </select>
                 <div class="mb-2">
                     <a href="/add_pupil">
                         <button class="btn btn-primary w-100">
-                            Додати нового учня
+                            Наявність учнів пільгових категорій з харчування окремо по класу
                         </button>
                     </a>
                 </div>
@@ -51,7 +85,5 @@
             </div>
         </div>
 
-    </div>
-    </div>
     </div>
 {% endblock %}

@@ -40,6 +40,7 @@ urlpatterns = [
 
     url(r'^reports$', views.ReportsView.as_view(), name='reports'),
     url(r'^report_group$', views.ReportGroupView.as_view(), name='report group'),
+    url(r'^report_food$', views.ReportFoodView.as_view(), name='report food'),
 
 
 ]
